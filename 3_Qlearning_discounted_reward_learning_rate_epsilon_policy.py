@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym
 import random
+from IPython.display import clear_output
+from time import sleep
+
 
 # CREATE THE ENVIRONMENT
 env = gym.make("Taxi-v2")
@@ -69,17 +72,24 @@ x = range(train_episodes)
 plt.plot(x, training_rewards)
 plt.xlabel('episode')
 plt.ylabel('Training cumulative reward')
-plt.savefig('Q-learning.png', dpi=300)
-# plt.show()
+plt.savefig('plots/Q-learning_discounted_reward_learning_rate_epsilon_policy.png', dpi=300)
+plt.show()
     
 # TEST PHASE
+
+
+
+
 test_rewards = []
+frames = [] # for animation
 
 for episode in range(test_episodes):
     state = env.reset()
     cumulative_test_rewards = 0
     print("****************************************************")
     print("EPISODE ", episode)
+
+
 
     for step in range(max_steps):
         env.render()             # UNCOMMENT IT IF YOU WANT TO SEE THE AGENT PLAYING
@@ -88,7 +98,17 @@ for episode in range(test_episodes):
         new_state, reward, done, info = env.step(action)
         cumulative_test_rewards += reward
         state = new_state
-        
+       
+
+        # Put each rendered frame into dict for animation
+        frames.append({
+            'frame': env.render(mode='ansi'),
+            'state': state,
+            'action': action,
+            'reward': reward
+            }
+        )
+
         if done:
             print ("Cumulative reward for episode {}: {}".format(episode, cumulative_test_rewards))
             break
@@ -98,3 +118,15 @@ env.close()
 print ("Test score over time: " + str(sum(test_rewards)/test_episodes))
 
 
+def print_frames(frames):
+    for i, frame in enumerate(frames):
+        clear_output(wait=True)
+        print(frame['frame'].getvalue())
+        print(f"Timestep: {i + 1}")
+        print(f"State: {frame['state']}")
+        print(f"Action: {frame['action']}")
+        print(f"Reward: {frame['reward']}")
+        sleep(.1)
+
+
+print_frames(frames)
